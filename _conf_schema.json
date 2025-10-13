@@ -1,0 +1,20 @@
+{
+  "api_url": {
+    "description": "梗图抽象猜词API接口地址",
+    "type": "string",
+    "hint": "填写梗图抽象猜词API的完整URL地址",
+    "default": "https://api.nycnm.cn/API/gengtu.php"
+  },
+  "api_key": {
+    "description": "API密钥",
+    "type": "string",
+    "hint": "访问API所需的密钥",
+    "default": ""
+  },
+  "timeout": {
+    "description": "请求超时(秒)",
+    "type": "int",
+    "hint": "接口请求的超时时间",
+    "default": 10
+  }
+}
