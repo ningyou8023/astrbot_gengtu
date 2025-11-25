@@ -19,7 +19,7 @@ PLUGIN_DATA_DIR.mkdir(parents=True, exist_ok=True)
     "astrbot_gengtu",
     "柠柚",
     "这是 AstrBot 的一个梗图抽象猜词插件，发送图片题目并校验答案",
-    "1.0.0",
+    "1.0.1",
 )
 class GengtuPlugin(Star):
     """
@@ -53,7 +53,6 @@ class GengtuPlugin(Star):
         """
         img_path = None
         try:
-            yield event.plain_result("🎯 正在获取梗图题目，请稍候...")
             q = await self._fetch_question()
             if not q:
                 yield event.plain_result("❌ 获取题目失败，请稍后重试")
@@ -63,32 +62,15 @@ class GengtuPlugin(Star):
             key = self._get_sender_key(event)
             self.pending_questions[key] = qid
 
-            # 下载图片到本地临时文件再发送
-            img_path = await self._download_image(image_url, qid)
-            if not img_path:
-                yield event.plain_result("❌ 图片加载失败，请稍后重试")
-                return
-
-            # 发送图片
-            yield event.image_result(img_path)
-
-            # 引导作答
-            yield event.plain_result("📝 请使用 /答案 你的答案 进行作答，例如：/答案 六六大顺")
+            from astrbot.api.message_components import Plain, Image
+            guide_text = "📝 使用 /答案 你的答案 作答\n💡 查看提示：/提示 或 /hint"
+            chain = [Image.fromURL(image_url), Plain(text=guide_text)]
+            yield event.chain_result(chain)
         except Exception as e:
             logger.error(f"获取梗图题目时发生错误: {e}")
             yield event.plain_result("❌ 获取梗图题目时发生错误，请稍后重试")
         finally:
-            # 用完后删除临时文件
-            if img_path and os.path.exists(img_path):
-                try:
-                    os.unlink(img_path)
-                    logger.info("成功删除临时文件")
-                except OSError as e:
-                    logger.warning(f"删除临时文件 {img_path} 失败: {e}")
-                except FileNotFoundError:
-                    logger.warning(f"临时文件 {img_path} 已经被删除或不存在")
-                except Exception as e:
-                    logger.warning(f"删除临时文件 {img_path} 失败: {e}")
+            pass
 
     @filter.command("answer", alias={"答案", "gengtu_answer", "猜词答案"})
     async def check_answer(self, event: AstrMessageEvent):
