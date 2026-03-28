@@ -11,15 +11,15 @@ from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star, register
 
 # 插件数据目录（用于缓存题目图片）
-PLUGIN_DATA_DIR = Path("data", "plugins_data", "astrbot_gengtu")
+PLUGIN_DATA_DIR = Path("data", "plugins_data", "astrbot_plugin_gengtu")
 PLUGIN_DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @register(
-    "astrbot_gengtu",
+    "astrbot_plugin_gengtu",
     "柠柚",
     "这是 AstrBot 的一个梗图抽象猜词插件，发送图片题目并校验答案",
-    "1.0.1",
+    "1.0.2",
 )
 class GengtuPlugin(Star):
     """
@@ -64,7 +64,14 @@ class GengtuPlugin(Star):
 
             from astrbot.api.message_components import Plain, Image
             guide_text = "📝 使用 /答案 你的答案 作答\n💡 查看提示：/提示 或 /hint"
-            chain = [Image.fromURL(image_url), Plain(text=guide_text)]
+            
+            img_path = await self._download_image(image_url, qid)
+            if img_path:
+                chain = [Image.fromFileSystem(img_path), Plain(text=guide_text)]
+            else:
+                # 备选方案，万一图片下载失败尝试直接发URL
+                chain = [Image.fromURL(image_url), Plain(text=guide_text)]
+                
             yield event.chain_result(chain)
         except Exception as e:
             logger.error(f"获取梗图题目时发生错误: {e}")
@@ -231,9 +238,14 @@ class GengtuPlugin(Star):
 
     async def _download_image(self, image_url: str, qid: int) -> Optional[str]:
         """下载题目图片到本地并返回文件路径。"""
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Referer": "https://www.xiaohongshu.com/",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7"
+        }
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(image_url, timeout=aiohttp.ClientTimeout(total=self.timeout)) as resp:
+                async with session.get(image_url, headers=headers, timeout=aiohttp.ClientTimeout(total=self.timeout)) as resp:
                     if resp.status != 200:
                         logger.error(f"图片下载失败，状态码: {resp.status}")
                         return None
