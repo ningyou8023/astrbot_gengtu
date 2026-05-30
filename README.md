@@ -16,7 +16,7 @@
 
 ## 返回示例
 
-题目接口：`https://api.nycnm.cn/API/gengtu.php?apikey=`
+题目接口：`https://api.nycnm.cn/api/v2/gengtu?apikey=`
 
 ```
 {
@@ -35,7 +35,7 @@
 }
 ```
 
-校验接口：`https://api.nycnm.cn/API/gengtu.php?check=8&answer=六六大顺&apikey=`
+校验接口：`https://api.nycnm.cn/api/v2/gengtu?check=8&answer=六六大顺&apikey=`
 
 ```
 {
