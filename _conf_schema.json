@@ -3,7 +3,7 @@
     "description": "梗图抽象猜词API接口地址",
     "type": "string",
     "hint": "填写梗图抽象猜词API的完整URL地址",
-    "default": "https://api.nycnm.cn/API/gengtu.php"
+    "default": "https://api.nycnm.cn/api/v2/gengtu"
   },
   "api_key": {
     "description": "API密钥",

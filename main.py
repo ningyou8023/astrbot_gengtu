@@ -19,7 +19,7 @@ PLUGIN_DATA_DIR.mkdir(parents=True, exist_ok=True)
     "astrbot_plugin_gengtu",
     "柠柚",
     "这是 AstrBot 的一个梗图抽象猜词插件，发送图片题目并校验答案",
-    "1.0.2",
+    "1.0.3",
 )
 class GengtuPlugin(Star):
     """
@@ -32,7 +32,7 @@ class GengtuPlugin(Star):
         super().__init__(context)
         self.config = config
         # 接口与配置
-        self.api_url = getattr(self.config, "api_url", "https://api.nycnm.cn/API/gengtu.php")
+        self.api_url = getattr(self.config, "api_url", "https://api.nycnm.cn/api/v2/gengtu")
         # 注意：API KEY 如需变更请在插件配置中修改
         self.api_key = getattr(
             self.config,
